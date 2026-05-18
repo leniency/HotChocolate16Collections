@@ -16,4 +16,17 @@ public class Queries
     {
         return new List<Question>().AsQueryable();
     }
+
+
+    // Works with static!
+    [UseOffsetPaging]
+    public static IQueryable<Answer> AllAnswers()
+        => new List<Answer>().AsQueryable();
+
+
+    // Error with non-static.
+    // Uncomment for error.
+    //[UseOffsetPaging]
+    //public IQueryable<Answer> SomeAnswers()
+    //    => new List<Answer>().AsQueryable();
 }
