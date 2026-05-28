@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="HotChocolate16Collections/HotChocolate16Collections.csproj" />
+  <Project Path="HotChocolate16Tests/HotChocolate16Tests.csproj" Id="7bbed669-e2b0-4433-92d3-af0b3bc0fbe5" />
 </Solution>

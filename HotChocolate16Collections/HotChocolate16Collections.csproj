@@ -7,15 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="16.0.4-p.1" />
-    <PackageReference Include="HotChocolate.Data" Version="16.0.4-p.1" />
-    <PackageReference Include="HotChocolate.Diagnostics" Version="16.0.4-p.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="16.0.4-p.1" />
-    <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.0.4-p.1">
+    <PackageReference Include="HotChocolate.AspNetCore" Version="16.0.9" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="16.0.9" />
+    <PackageReference Include="HotChocolate.Data" Version="16.0.9" />
+    <PackageReference Include="HotChocolate.Diagnostics" Version="16.0.9" />
+    <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="16.0.9" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.0.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="16.0.4-p.1" />
+    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="16.0.9" />
   </ItemGroup>
 
 </Project>

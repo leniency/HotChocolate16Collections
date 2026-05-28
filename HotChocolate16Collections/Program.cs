@@ -1,15 +1,18 @@
+using HotChocolate16Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var g = builder.Services
+
+
+var graphBuilder = builder.Services
     .AddGraphQLServer()
+    .ExportSchemaOnStartup("./schema.graphql")
+    .AddAuthorization()
     .AddHotChocolate16CollectionsTypes()
-    .ModifyPagingOptions(o =>
+    .TryAddTypeInterceptor<ValidationDirectiveInterceptor>()
+    .ModifyOptions(options =>
     {
-        // Use the type name rather than the property
-        // name for paging types.
-        o.InferCollectionSegmentNameFromField = false;
-        o.InferConnectionNameFromField = false;
+        options.DisableInternalDirectives = true;
     });
 
 
@@ -20,3 +23,9 @@ app.MapGet("/", () => "Hello World!");
 app.MapGraphQL();
 
 app.Run();
+
+
+namespace HotChocolate16Collections
+{
+    public partial class Program { }
+}
