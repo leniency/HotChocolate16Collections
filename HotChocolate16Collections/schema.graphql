@@ -4,7 +4,13 @@ schema {
 
 type Query {
   hello(name: String!): String!
+  nestedInstance: NestedInstance!
   hello2(name: String! @validation): String!
+}
+
+type NestedInstance {
+  helloExt(name: String!): String!
+  hello1(name: String! @validation): String!
 }
 
 "Defines when a policy shall be executed."
