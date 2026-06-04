@@ -9,7 +9,7 @@ var graphBuilder = builder.Services
     .ExportSchemaOnStartup("./schema.graphql")
     .AddAuthorization()
     .AddHotChocolate16CollectionsTypes()
-    .TryAddTypeInterceptor<ValidationDirectiveInterceptor>()
+    .TryAddTypeInterceptor<CustomDirectiveInterceptor>()
     .ModifyOptions(options =>
     {
         options.DisableInternalDirectives = true;

@@ -3,14 +3,11 @@ schema {
 }
 
 type Query {
-  hello(name: String!): String!
-  nestedInstance: NestedInstance!
-  hello2(name: String! @validation): String!
+  hello(name: String!, input: InputObjectInput!): String!
 }
 
-type NestedInstance {
-  helloExt(name: String!): String!
-  hello1(name: String! @validation): String!
+input InputObjectInput @custom {
+  name: String! @custom
 }
 
 "Defines when a policy shall be executed."
@@ -23,7 +20,9 @@ enum ApplyPolicy {
   VALIDATION
 }
 
-directive @validation on
+directive @custom on
+  | OBJECT
   | FIELD_DEFINITION
   | ARGUMENT_DEFINITION
+  | INPUT_OBJECT
   | INPUT_FIELD_DEFINITION

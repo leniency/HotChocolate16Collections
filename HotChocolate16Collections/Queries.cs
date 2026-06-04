@@ -1,40 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace HotChocolate16Collections;
+﻿namespace HotChocolate16Collections;
 
 [QueryType]
 public static partial class Queries
 {
     // Doesn't work.
     // Generated schema is:
-    // hello(name: String!): String!
+    // hello(name: String!, input: InputObject!): String!
 
     // Expects:
-    // hello(name: String! @validation): String!
+    // ``
+    // @custom
+    // hello(name: String! @custom, input: InputObject! @custom): String!
+    // ``
 
-    public static string Hello([StringLength(50)] string name) => $"Hello, {name}!";
-
-    public static NestedInstance NestedInstance() => new();
-}
-
-public class NestedInstance
-{
-    // Works as expected.
-    public string Hello1([StringLength(50)] string name) => $"Hello, {name}!";
-}
-
-[ObjectType<NestedInstance>]
-public static partial class NestedExtensions
-{
-    // Doesn't work.
-    public static string HelloExt([StringLength(50)] string name) => $"Hello, {name}!";
+    [Custom]
+    public static string Hello([Custom] string name, [Custom] InputObject input) => $"Hello, {name}!";
 }
 
 
-[QueryType]
-public class InstanceQuery
+[Custom]
+public class InputObject
 {
-    // Works as expected.
-
-    public string Hello2([StringLength(50)] string name) => $"Hello, {name}!";
+    [Custom]
+    public string Name { get; set; } = default!;
 }
