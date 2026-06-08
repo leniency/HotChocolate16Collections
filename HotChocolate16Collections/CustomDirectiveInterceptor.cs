@@ -1,113 +1,105 @@
 ﻿using HotChocolate.Configuration;
 using HotChocolate.Types.Descriptors;
 using HotChocolate.Types.Descriptors.Configurations;
-using System.ComponentModel.DataAnnotations;
 
 namespace HotChocolate16Collections;
 
+
+class CustomDirectiveInterceptor : CustomDirectiveInterceptorBase
+{
+    protected override void ApplyAttributes<T>(T field, object[] attributes, ITypeDiscoveryContext discoveryContext)
+    {
+        foreach (var attribute in attributes)
+        {
+            if (attribute is CustomAttribute)
+            {
+                // ... other stuff around the specific custom attribute...
+
+                // Add to the field.
+                var directive = new CustomDirective();
+                var validationTypeRef = TypeReference.CreateDirective(discoveryContext.TypeInspector.GetType(directive.GetType()));
+
+                field.Directives.Add(new DirectiveConfiguration(
+                    directive,
+                    validationTypeRef));
+            }
+        }
+    }
+}
+
+
 /// <summary>
-/// Apply a directive from an attribute.
+/// Base type interceptor for custom directives. 
 /// </summary>
-class CustomDirectiveInterceptor : TypeInterceptor
+abstract class CustomDirectiveInterceptorBase : TypeInterceptor
 {
     /// <summary>
-    /// Apply directives to schema types.
+    /// Apply directives from type attributes.
     /// </summary>
     /// <param name="discoveryContext"></param>
-    /// <param name="configuration"></param>
-    public override void OnBeforeRegisterDependencies(ITypeDiscoveryContext discoveryContext, TypeSystemConfiguration configuration)
+    /// <param name="definition"></param>
+    public override void OnBeforeRegisterDependencies(ITypeDiscoveryContext discoveryContext, TypeSystemConfiguration definition)
     {
-        // Object types
-        if (configuration is ObjectTypeConfiguration obj)
+        if (definition is ObjectTypeConfiguration objectTypeDefinition)
         {
-            Apply(obj, i => i.RuntimeType.GetCustomAttributes(true), discoveryContext);
+            // Location: OBJECT
+            ApplyDefinitionAttributes(
+                objectTypeDefinition,
+                objectTypeDefinition.RuntimeType?.GetCustomAttributes(true),
+                discoveryContext);
 
-            // Apply to fields
-            foreach (var field in obj.Fields)
+            foreach (var field in objectTypeDefinition.Fields)
             {
-                ApplyFieldDirectives(field, f => f?.Member?.GetCustomAttributes(true), discoveryContext);
+                // Location: FIELD_DEFINITION
+                ApplyDefinitionAttributes(
+                    field,
+                    field.Member?.GetCustomAttributes(true),
+                    discoveryContext);
 
-                // Apply to arguments
-                foreach (var argument in field.Arguments)
+                if (field.Arguments?.Count > 0)
                 {
-                    if (argument is not { Parameter: { } parameter })
+                    foreach (var argument in field.Arguments)
                     {
-                        continue;
+                        // Location: ARGUMENT_DEFINITION
+                        ApplyDefinitionAttributes(
+                            argument,
+                            argument.Parameter?.GetCustomAttributes(true),
+                            discoveryContext);
                     }
-
-                    ApplyFieldDirectives(argument, f => parameter.GetCustomAttributes(true), discoveryContext);
                 }
             }
         }
 
-        // Input object types
-        if (configuration is InputObjectTypeConfiguration inputObjectTypeDefinition)
+        if (definition is InputObjectTypeConfiguration inputObjectTypeDefinition)
         {
-            Apply(inputObjectTypeDefinition, i => i.RuntimeType.GetCustomAttributes(true), discoveryContext);
-
+            // Location: INPUT_OBJECT
+            ApplyDefinitionAttributes(
+                inputObjectTypeDefinition,
+                inputObjectTypeDefinition.RuntimeType?.GetCustomAttributes(true),
+                discoveryContext);
 
             foreach (var field in inputObjectTypeDefinition.Fields)
             {
-                if (field.Property != null)
-                {
-                    ApplyFieldDirectives(field, f => f?.Property?.GetCustomAttributes(true), discoveryContext);
-                }
+                // Location: INPUT_FIELD_DEFINITION
+                ApplyDefinitionAttributes(
+                    field,
+                    field.Property?.GetCustomAttributes(true),
+                    discoveryContext);
             }
         }
     }
 
-    void Apply<T>(T field, Func<T, object[]?> attrs, ITypeDiscoveryContext discoveryContext)
-        where T : TypeConfiguration
+    void ApplyDefinitionAttributes<T>(T field, object[]? attributes, ITypeDiscoveryContext discoveryContext)
+        where T : IDirectiveConfigurationProvider
     {
-        var attributes = attrs(field);
         if (attributes == null || attributes.Length == 0)
         {
             return;
         }
 
-        foreach (var attribute in attributes)
-        {
-            if (attribute is CustomAttribute)
-            {
-                // ... other stuff around the specific custom attribute...
-
-                // Add to the field.
-                var directive = new CustomDirective();
-                var validationTypeRef = TypeReference.CreateDirective(discoveryContext.TypeInspector.GetType(directive.GetType()));
-
-                field.Directives.Add(new DirectiveConfiguration(
-                    directive,
-                    validationTypeRef));
-            }
-        }
+        ApplyAttributes(field, attributes, discoveryContext);
     }
 
-
-
-
-    void ApplyFieldDirectives<T>(T field, Func<T, object[]?> attrs, ITypeDiscoveryContext discoveryContext)
-        where T : FieldConfiguration
-    {
-        var attributes = attrs(field);
-        if (attributes == null || attributes.Length == 0)
-        {
-            return;
-        }
-
-        foreach (var attribute in attributes)
-        {
-            if (attribute is CustomAttribute)
-            {
-                // ... other stuff around the specific custom attribute...
-
-                // Add to the field.
-                var directive = new CustomDirective();
-                var validationTypeRef = TypeReference.CreateDirective(discoveryContext.TypeInspector.GetType(directive.GetType()));
-
-                field.Directives.Add(new DirectiveConfiguration(
-                    directive,
-                    validationTypeRef));
-            }
-        }
-    }
+    protected abstract void ApplyAttributes<T>(T field, object[] attributes, ITypeDiscoveryContext discoveryContext)
+       where T : IDirectiveConfigurationProvider;
 }
