@@ -5,33 +5,7 @@ using HotChocolate.Types.Descriptors.Configurations;
 namespace HotChocolate16Collections;
 
 
-class CustomDirectiveInterceptor : CustomDirectiveInterceptorBase
-{
-    protected override void ApplyAttributes<T>(T field, object[] attributes, ITypeDiscoveryContext discoveryContext)
-    {
-        foreach (var attribute in attributes)
-        {
-            if (attribute is CustomAttribute)
-            {
-                // ... other stuff around the specific custom attribute...
-
-                // Add to the field.
-                var directive = new CustomDirective();
-                var validationTypeRef = TypeReference.CreateDirective(discoveryContext.TypeInspector.GetType(directive.GetType()));
-
-                field.Directives.Add(new DirectiveConfiguration(
-                    directive,
-                    validationTypeRef));
-            }
-        }
-    }
-}
-
-
-/// <summary>
-/// Base type interceptor for custom directives. 
-/// </summary>
-abstract class CustomDirectiveInterceptorBase : TypeInterceptor
+class CustomDirectiveInterceptor : TypeInterceptor
 {
     /// <summary>
     /// Apply directives from type attributes.
@@ -89,7 +63,7 @@ abstract class CustomDirectiveInterceptorBase : TypeInterceptor
         }
     }
 
-    void ApplyDefinitionAttributes<T>(T field, object[]? attributes, ITypeDiscoveryContext discoveryContext)
+    static void ApplyDefinitionAttributes<T>(T field, object[]? attributes, ITypeDiscoveryContext discoveryContext)
         where T : IDirectiveConfigurationProvider
     {
         if (attributes == null || attributes.Length == 0)
@@ -97,9 +71,20 @@ abstract class CustomDirectiveInterceptorBase : TypeInterceptor
             return;
         }
 
-        ApplyAttributes(field, attributes, discoveryContext);
-    }
+        foreach (var attribute in attributes)
+        {
+            if (attribute is CustomAttribute)
+            {
+                // ... other stuff around the specific custom attribute...
 
-    protected abstract void ApplyAttributes<T>(T field, object[] attributes, ITypeDiscoveryContext discoveryContext)
-       where T : IDirectiveConfigurationProvider;
+                // Add to the field.
+                var directive = new CustomDirective();
+                var validationTypeRef = TypeReference.CreateDirective(discoveryContext.TypeInspector.GetType(directive.GetType()));
+
+                field.Directives.Add(new DirectiveConfiguration(
+                    directive,
+                    validationTypeRef));
+            }
+        }
+    }
 }
