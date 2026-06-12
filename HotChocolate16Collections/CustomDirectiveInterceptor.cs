@@ -5,7 +5,7 @@ using HotChocolate.Types.Descriptors.Configurations;
 namespace HotChocolate16Collections;
 
 
-class CustomDirectiveInterceptor : TypeInterceptor
+public class CustomDirectiveInterceptor : TypeInterceptor
 {
     /// <summary>
     /// Apply directives from type attributes.

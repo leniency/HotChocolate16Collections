@@ -1,4 +1,6 @@
-﻿namespace HotChocolate16Collections;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HotChocolate16Collections;
 
 [QueryType]
 public static partial class Queries
@@ -9,8 +11,7 @@ public static partial class Queries
 
     // Expects:
     // ``
-    // @custom
-    // hello(name: String! @custom, input: InputObject! @custom): String!
+    // hello(name: String! @custom, input: InputObject! @custom): String! @custom
     // ``
 
     [Custom]
